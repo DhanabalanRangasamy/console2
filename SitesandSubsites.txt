@@ -1,0 +1,17 @@
+#Connect to Sharepoint online admin center
+connect-sposervice -Url https://abbott-admin.sharepoint.com
+#Fetch all sites and store it in a variable
+$siteslist=Get-sposite -Limit All
+#Iterate through all sites to get it subsite
+foreach($site in $siteslist)
+{
+#Add yourself as admin to fetch subsites
+set-spouser -site $site.Url -issitecollectionadmin $true -loginname dhanabalan.rangasamy@abbott.onmicrosoft.com
+#Use pnp to get subsites sub webs as well
+$a=connect-pnponline -url $site.Url  -UseWebLogin
+$b=Get-pnpsubwebs -Recurse
+# Use out-file to output
+"`t $($site.Url) `t $($b.url)" | out-file c:\reporlast.csv -Append
+#Remove your admin access
+set-spouser -site $site.Url  -issitecollectionadmin $false -loginname dhanabalan.rangasamy@abbott.onmicrosoft.com
+}
